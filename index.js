@@ -28,6 +28,27 @@ server.post('/api/zoos', (req, res) => {
   }
 })
 
+server.get('/api/zoos', (req, res) => {
+  db.select().table('zoos')
+  .then(response => {
+    res.status(200).json(response)
+  })
+  .catch(err => res.status(500).json({error : "Could not get from db"}))
+})
+
+server.get('/api/zoos/:id', (req, res) => {
+  const id = req.params.id;
+  db.select().table('zoos').where("id", id)
+  .then(response => {
+    if (response.length < 1) {
+      res.status(404).json({error: "ID does not exist."})
+    } else {
+      res.status(200).json(response)
+    }
+  })
+  .catch(err => res.status(500).json({error : "Could not complete GET from db."}))
+})
+
 const port = 3300;
 server.listen(port, function() {
   console.log(`\n=== Web API Listening on http://localhost:${port} ===\n`);
