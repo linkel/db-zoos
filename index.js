@@ -23,7 +23,7 @@ server.post('/api/zoos', (req, res) => {
       res.status(201).json(ids[0]);
     })
     .catch(err => {
-      res.status(500).json(err);
+      res.status(500).json({error: "Failed to post to db."});
     })
   }
 })
@@ -47,6 +47,40 @@ server.get('/api/zoos/:id', (req, res) => {
     }
   })
   .catch(err => res.status(500).json({error : "Could not complete GET from db."}))
+})
+
+server.delete('/api/zoos/:id', (req, res) => {
+  const id = req.params.id;
+  db('zoos').where("id", id).del()
+  .then(response => {
+    if (response < 1) {
+      res.status(404).json({message : `ID ${id} doesn't exist!`})
+    } else {
+      res.status(200).json({message: `Successfully deleted zoo with ID${id}`})
+    }
+  })
+  .catch(err => {
+    res.status(500).json({error: "Could not delete from db"})
+  })
+})
+
+server.put('/api/zoos', (req, res) => {
+  const zoo = req.body;
+  if (!zoo.name) {
+    res.status(500).json({error: "Please provide a name."});
+  } else {
+    db('zoo').where("id",id).update('name',zoo.name)
+    .then(updated => {
+      if (updated.length < 1){
+        res.status(404).json({error: `This ID ${id} does not exist!`})
+      } else {
+        res.status(200).json(updated);
+      }
+    })
+    .catch(err => {
+      res.status(500).json({error: "Failed to update DB."});
+    })
+  }
 })
 
 const port = 3300;
